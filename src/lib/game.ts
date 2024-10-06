@@ -21,6 +21,8 @@ export type GameContext = {
   lastResult?: boolean;
   results: boolean[];
   score: number;
+  timeTaken: number;
+  questionStartTime?: number;
 };
 
 export type GameEvents =
@@ -69,12 +71,15 @@ export const machine = setup({
         results: [],
         score: 0,
         currentQuestion: questions[0],
+        timeTaken: 0,
+        questionStartTime: Date.now(),
       };
     }),
     selectNewQuestion: assign(({ context }) => {
       const currentQuestion = context.questions[context.currentQuestionIndex];
       return {
         currentQuestion,
+        questionStartTime: Date.now(),
       };
     }),
     reviewAnswer: assign(({ context, event }) => {
@@ -82,11 +87,17 @@ export const machine = setup({
 
       const isCorrect = context.currentQuestion?.answers[event.index].correct ?? false;
       const newScore = context.score + (isCorrect ? 1 : 0);
+      const questionEndTime = Date.now();
+      const questionTime = context.questionStartTime
+        ? questionEndTime - context.questionStartTime
+        : 0;
 
       return {
         lastResult: isCorrect,
         results: [...context.results, isCorrect],
         score: newScore,
+        timeTaken: context.timeTaken + questionTime,
+        questionStartTime: undefined,
       };
     }),
     incrementQuestionIndex: assign(({ context }) => {
@@ -103,6 +114,8 @@ export const machine = setup({
         lastResult: undefined,
         results: [],
         score: 0,
+        timeTaken: 0,
+        questionStartTime: undefined,
       };
     }),
   },
@@ -113,6 +126,7 @@ export const machine = setup({
     currentQuestionIndex: 0,
     results: [],
     score: 0,
+    timeTaken: 0,
   },
   id: 'game',
   initial: 'difficultySelection',
