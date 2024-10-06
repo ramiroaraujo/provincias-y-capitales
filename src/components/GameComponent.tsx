@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useMachine } from '@xstate/react';
 import { Button } from '@/components/ui/button';
 import { machine } from '@/lib/game';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function GameComponent() {
   const [state, send] = useMachine(machine);
@@ -44,18 +45,31 @@ export default function GameComponent() {
           <h2 className="text-lg mb-4 text-center">
             ¿Cuál es la capital de {state.context.currentQuestion.question}?
           </h2>
-          <div className="grid grid-cols-1 gap-2 w-full">
-            {state.context.currentQuestion.answers.map((answer, index) => (
-              <Button key={index} onClick={() => handleAnswer(index)} className="w-full">
-                {answer.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
-      {state.matches({ playing: 'result' }) && (
-        <div className="text-xl mb-4 text-center">
-          {state.context.lastResult ? '¡Bien ahí!' : '¡Uh, le erraste!'}
+          {state.matches({ playing: 'question' }) && (
+            <div className="grid grid-cols-1 gap-2 w-full">
+              {state.context.currentQuestion.answers.map((answer, index) => (
+                <Button key={index} onClick={() => handleAnswer(index)} className="w-full">
+                  {answer.name}
+                </Button>
+              ))}
+            </div>
+          )}
+          {state.matches({ playing: 'result' }) && (
+            <div className="flex flex-col items-center w-full">
+              {state.context.lastResult ? (
+                <CheckCircle2 className="w-24 h-24 text-green-500 mb-4" />
+              ) : (
+                <AlertCircle className="w-24 h-24 text-red-500 mb-4" />
+              )}
+              <p className="text-2xl mb-2">
+                {state.context.lastResult ? '¡Bien ahí!' : '¡Uh, le erraste!'}
+              </p>
+              <p className="text-lg mb-4">
+                La respuesta correcta es:{' '}
+                {state.context.currentQuestion.answers.find((a) => a.correct)?.name}
+              </p>
+            </div>
+          )}
         </div>
       )}
       {state.matches('gameOver') && (
