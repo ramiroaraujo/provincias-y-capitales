@@ -26,7 +26,8 @@ export type GameContext = {
 export type GameEvents =
   | { type: 'SELECT'; difficulty: number }
   | { type: 'ANSWER'; index: number }
-  | { type: 'RESTART' };
+  | { type: 'RESTART' }
+  | { type: 'NEXT' };
 
 const generateQuestions = (difficulty: number): Question[] => {
   const shuffledProvinces = shuffleArray(provinces);
@@ -137,6 +138,11 @@ export const machine = setup({
           },
         },
         result: {
+          on: {
+            NEXT: {
+              target: 'next',
+            },
+          },
           after: {
             2500: {
               target: 'next',

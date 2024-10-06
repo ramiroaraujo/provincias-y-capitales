@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useMachine } from '@xstate/react';
 import { Button } from '@/components/ui/button';
 import { machine } from '@/lib/game';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function GameComponent() {
   const [state, send] = useMachine(machine);
@@ -18,6 +18,10 @@ export default function GameComponent() {
     send({ type: 'ANSWER', index });
   };
 
+  const handleNext = () => {
+    send({ type: 'NEXT' });
+  };
+
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-4">
       {state.matches('difficultySelection') && (
@@ -29,13 +33,13 @@ export default function GameComponent() {
                 key={level}
                 onClick={() => setSelectedDifficulty(level)}
                 variant={selectedDifficulty === level ? 'default' : 'outline'}
-                className="flex-1"
+                className="flex-1 h-12"
               >
                 {level}
               </Button>
             ))}
           </div>
-          <Button onClick={handleStart} className="w-full">
+          <Button onClick={handleStart} className="w-full h-12">
             Arrancar el juego
           </Button>
         </div>
@@ -48,7 +52,7 @@ export default function GameComponent() {
           {state.matches({ playing: 'question' }) && (
             <div className="grid grid-cols-1 gap-2 w-full">
               {state.context.currentQuestion.answers.map((answer, index) => (
-                <Button key={index} onClick={() => handleAnswer(index)} className="w-full">
+                <Button key={index} onClick={() => handleAnswer(index)} className="w-full h-12">
                   {answer.name}
                 </Button>
               ))}
@@ -64,10 +68,13 @@ export default function GameComponent() {
               <p className="text-2xl mb-2">
                 {state.context.lastResult ? '¡Bien ahí!' : '¡Uh, le erraste!'}
               </p>
-              <p className="text-lg mb-4">
-                La respuesta correcta es:{' '}
+              {state.context.lastResult && <p className="text-lg mb-4"> la correcta es:</p>}
+              <p className="text-3xl font-bold mb-4 text-center">
                 {state.context.currentQuestion.answers.find((a) => a.correct)?.name}
               </p>
+              <Button onClick={handleNext} className="w-full h-12">
+                Siguiente <ArrowRight className="ml-2" />
+              </Button>
             </div>
           )}
         </div>
@@ -78,7 +85,7 @@ export default function GameComponent() {
           <p className="text-lg mb-4 text-center">
             Tu puntaje: {state.context.score} / {state.context.questions.length}
           </p>
-          <Button onClick={() => send({ type: 'RESTART' })} className="w-full">
+          <Button onClick={() => send({ type: 'RESTART' })} className="w-full h-12">
             Jugar de nuevo
           </Button>
         </div>
