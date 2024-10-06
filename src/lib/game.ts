@@ -127,6 +127,12 @@ export const machine = setup({
     },
     playing: {
       initial: 'question',
+      on: {
+        RESTART: {
+          actions: 'resetGame',
+          target: 'difficultySelection',
+        },
+      },
       states: {
         question: {
           entry: 'selectNewQuestion',
