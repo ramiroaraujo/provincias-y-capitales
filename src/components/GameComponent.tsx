@@ -1,14 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMachine } from '@xstate/react';
 import { Button } from '@/components/ui/button';
-import { machine } from '@/lib/game';
-import { AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { machine, timeLimit } from '@/lib/game';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function GameComponent() {
   const [state, send] = useMachine(machine);
   const [selectedDifficulty, setSelectedDifficulty] = useState(1);
+  const [progress, setProgress] = useState(100);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (state.matches({ playing: 'question' }) && state.context.questionStartTime) {
+      const updateProgress = () => {
+        const elapsedTime = Date.now() - state.context.questionStartTime!;
+        const totalTime = timeLimit[state.context.difficulty as 1 | 2 | 3];
+        const newProgress = Math.max(0, 100 - (elapsedTime / totalTime) * 100);
+        setProgress(newProgress);
+      };
+
+      intervalId = setInterval(updateProgress, 50);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [state.context.questionStartTime, state.context.difficulty, state.value]);
 
   const handleStart = () => {
     send({ type: 'SELECT', difficulty: selectedDifficulty });
@@ -56,21 +79,24 @@ export default function GameComponent() {
           )}
           {state.matches('playing') && state.context.currentQuestion && (
             <div className="flex flex-col items-center w-full">
-              <h2 className="text-base md:text-lg mb-4 text-center">
+              <h2 className="text-lg md:text-xl font-bold mb-4 text-center">
                 ¿Cuál es la capital de {state.context.currentQuestion.question}?
               </h2>
               {state.matches({ playing: 'question' }) && (
-                <div className="grid grid-cols-1 gap-2 w-full">
-                  {state.context.currentQuestion.answers.map((answer, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => handleAnswer(index)}
-                      className="w-full h-12 active:scale-95 transition-transform"
-                    >
-                      {answer.name}
-                    </Button>
-                  ))}
-                </div>
+                <>
+                  <Progress value={progress} className="w-full mb-4" />
+                  <div className="grid grid-cols-1 gap-2 w-full">
+                    {state.context.currentQuestion.answers.map((answer, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => handleAnswer(index)}
+                        className="w-full h-12 active:scale-95 transition-transform"
+                      >
+                        {answer.name}
+                      </Button>
+                    ))}
+                  </div>
+                </>
               )}
               {state.matches({ playing: 'result' }) && (
                 <div

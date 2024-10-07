@@ -48,10 +48,10 @@ const generateQuestions = (difficulty: number): Question[] => {
   });
 };
 
-const timeLimit = {
-  1: 3000,
+export const timeLimit = {
+  1: 15000,
   2: 6000,
-  3: 15000,
+  3: 3000,
 };
 
 export const machine = setup({
