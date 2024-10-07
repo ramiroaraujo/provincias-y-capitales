@@ -85,6 +85,7 @@ export const machine = setup({
         currentQuestion: questions[0],
         timeTaken: 0,
         questionStartTime: Date.now(),
+        lastResult: undefined,
       };
     }),
     selectNewQuestion: assign(({ context }) => {
@@ -92,12 +93,25 @@ export const machine = setup({
       return {
         currentQuestion,
         questionStartTime: Date.now(),
+        lastResult: undefined,
+      };
+    }),
+    timeout: assign(({ context }) => {
+      const questionEndTime = Date.now();
+      const questionTime = context.questionStartTime
+        ? questionEndTime - context.questionStartTime
+        : 0;
+      return {
+        lastResult: false,
+        results: [...context.results, false],
+        timeTaken: context.timeTaken + questionTime,
+        questionStartTime: undefined,
       };
     }),
     reviewAnswer: assign(({ context, event }) => {
       if (event.type !== 'ANSWER') return context;
 
-      const isCorrect = context.currentQuestion?.answers[event.index].correct ?? false;
+      const isCorrect = context.currentQuestion?.answers[event.index]?.correct ?? false;
       const newScore = context.score + (isCorrect ? 1 : 0);
       const questionEndTime = Date.now();
       const questionTime = context.questionStartTime
@@ -165,14 +179,17 @@ export const machine = setup({
           after: {
             3000: {
               guard: 'isTimeLimit',
+              actions: 'timeout',
               target: 'result',
             },
             6000: {
               guard: 'isTimeLimit',
+              actions: 'timeout',
               target: 'result',
             },
             15000: {
               guard: 'isTimeLimit',
+              actions: 'timeout',
               target: 'result',
             },
           },
