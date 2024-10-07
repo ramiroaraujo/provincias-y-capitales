@@ -34,7 +34,7 @@ export type GameEvents =
 const generateQuestions = (difficulty: number): Question[] => {
   const shuffledProvinces = shuffleArray(provinces);
   const numAnswers = difficulty === 1 ? 3 : difficulty === 2 ? 4 : 5;
-  return shuffledProvinces.slice(0, 10).map((province) => {
+  return shuffledProvinces.map((province) => {
     const correctAnswer = province.options.find((opt) => opt.correct)!;
     const incorrectOptions = shuffleArray(
       province.options.filter((opt) => !opt.correct && opt.difficulty <= difficulty)
