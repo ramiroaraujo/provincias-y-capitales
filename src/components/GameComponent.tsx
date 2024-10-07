@@ -118,6 +118,14 @@ export default function GameComponent() {
                     {state.context.currentQuestion.answers.find((a) => a.correct)?.name}
                   </p>
                   <p className="text-sm md:text-base text-gray-500">Tocá para continuar</p>
+                  <div className="w-full mt-10">
+                    <Button
+                      onClick={handleNext}
+                      className="w-full h-12 active:scale-95 transition-transform"
+                    >
+                      Continuar
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
