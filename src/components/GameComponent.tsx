@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { machine, timeLimit } from '@/lib/game';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import useSound from '@/hooks/useSound';
 
 export default function GameComponent() {
   const [state, send] = useMachine(machine);
   const [selectedDifficulty, setSelectedDifficulty] = useState(1);
   const [progress, setProgress] = useState(100);
+  const playSound = useSound();
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -34,6 +36,7 @@ export default function GameComponent() {
   }, [state.context.questionStartTime, state.context.difficulty, state.value]);
 
   const handleStart = () => {
+    playSound('tap');
     send({ type: 'SELECT', difficulty: selectedDifficulty });
   };
 
@@ -42,12 +45,23 @@ export default function GameComponent() {
   };
 
   const handleNext = () => {
+    playSound('tap');
     send({ type: 'NEXT' });
   };
 
   const handleRestart = () => {
+    playSound('tap');
     send({ type: 'RESTART' });
   };
+
+  useEffect(() => {
+    if (state.matches({ playing: 'result' })) {
+      playSound(state.context.lastResult ? 'right' : 'wrong');
+    }
+  }, [playSound, state, state.value]);
+
+  // Get the correct answer
+  const correctAnswer = state.context.currentQuestion?.answers.find((a) => a.correct)?.name;
 
   return (
     <div className="flex flex-col w-full max-w-sm md:max-w-md mx-auto px-4 py-6 h-full">
@@ -61,7 +75,10 @@ export default function GameComponent() {
                 {[1, 2, 3].map((level) => (
                   <Button
                     key={level}
-                    onClick={() => setSelectedDifficulty(level)}
+                    onClick={() => {
+                      playSound('tap');
+                      setSelectedDifficulty(level);
+                    }}
                     variant={selectedDifficulty === level ? 'default' : 'outline'}
                     className="flex-1 h-12 active:scale-95 transition-transform"
                   >
@@ -112,9 +129,7 @@ export default function GameComponent() {
                   {!state.context.lastResult && (
                     <p className="text-base md:text-lg mb-2">La correcta es:</p>
                   )}
-                  <p className="text-2xl md:text-3xl font-bold mb-4 text-center">
-                    {state.context.currentQuestion.answers.find((a) => a.correct)?.name}
-                  </p>
+                  <p className="text-2xl md:text-3xl font-bold mb-4 text-center">{correctAnswer}</p>
                   <p className="text-sm md:text-base text-gray-500">Tocá para continuar</p>
                   <div className="w-full mt-10">
                     <Button
