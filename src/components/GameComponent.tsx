@@ -108,9 +108,7 @@ export default function GameComponent() {
                   ) : (
                     <AlertCircle className="w-16 h-16 md:w-20 md:h-20 text-red-500 mb-2" />
                   )}
-                  <p className="text-xl md:text-2xl mb-1">
-                    {state.context.lastResult ? '¡Bien ahí!' : '¡Uh, le erraste!'}
-                  </p>
+                  <p className="text-xl md:text-2xl mb-1">{state.context.lastResultExpression}</p>
                   {!state.context.lastResult && (
                     <p className="text-base md:text-lg mb-2">La correcta es:</p>
                   )}

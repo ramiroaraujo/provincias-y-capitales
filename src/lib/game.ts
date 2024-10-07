@@ -1,5 +1,5 @@
 import { assign, setup } from 'xstate';
-import { shuffleArray } from '@/lib/utils';
+import { getRandomExpression, shuffleArray } from '@/lib/utils';
 import { provinces } from '@/lib/provinces';
 
 export type Question = {
@@ -19,6 +19,7 @@ export type GameContext = {
   currentQuestionIndex: number;
   currentQuestion?: Question;
   lastResult?: boolean;
+  lastResultExpression?: string;
   results: boolean[];
   score: number;
   timeTaken: number;
@@ -86,6 +87,7 @@ export const machine = setup({
         timeTaken: 0,
         questionStartTime: Date.now(),
         lastResult: undefined,
+        lastResultExpression: undefined,
       };
     }),
     selectNewQuestion: assign(({ context }) => {
@@ -94,6 +96,7 @@ export const machine = setup({
         currentQuestion,
         questionStartTime: Date.now(),
         lastResult: undefined,
+        lastResultExpression: undefined,
       };
     }),
     timeout: assign(({ context }) => {
@@ -103,6 +106,7 @@ export const machine = setup({
         : 0;
       return {
         lastResult: false,
+        lastResultExpression: getRandomExpression(false),
         results: [...context.results, false],
         timeTaken: context.timeTaken + questionTime,
         questionStartTime: undefined,
@@ -120,6 +124,7 @@ export const machine = setup({
 
       return {
         lastResult: isCorrect,
+        lastResultExpression: getRandomExpression(isCorrect),
         results: [...context.results, isCorrect],
         score: newScore,
         timeTaken: context.timeTaken + questionTime,
@@ -138,6 +143,7 @@ export const machine = setup({
         currentQuestionIndex: 0,
         currentQuestion: undefined,
         lastResult: undefined,
+        lastResultExpression: undefined,
         results: [],
         score: 0,
         timeTaken: 0,
