@@ -48,6 +48,12 @@ const generateQuestions = (difficulty: number): Question[] => {
   });
 };
 
+const timeLimit = {
+  1: 3000,
+  2: 6000,
+  3: 15000,
+};
+
 export const machine = setup({
   types: {
     context: {} as GameContext,
@@ -56,6 +62,11 @@ export const machine = setup({
   guards: {
     hasMoreQuestions: ({ context }) => {
       return context.currentQuestionIndex < context.questions.length - 1;
+    },
+    isTimeLimit: ({ context }) => {
+      const currentTime = Date.now();
+      const timeLimitForDifficulty = timeLimit[context.difficulty as 1 | 2 | 3];
+      return currentTime - context.questionStartTime! >= timeLimitForDifficulty;
     },
   },
   actions: {
@@ -150,6 +161,20 @@ export const machine = setup({
       states: {
         question: {
           entry: 'selectNewQuestion',
+          after: {
+            3000: {
+              guard: 'isTimeLimit',
+              target: 'result',
+            },
+            6000: {
+              guard: 'isTimeLimit',
+              target: 'result',
+            },
+            15000: {
+              guard: 'isTimeLimit',
+              target: 'result',
+            },
+          },
           on: {
             ANSWER: {
               actions: 'reviewAnswer',
