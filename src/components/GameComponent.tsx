@@ -141,7 +141,7 @@ export default function GameComponent() {
           )}
         </div>
         {state.matches('playing') && (
-          <div className="w-full mt-4">
+          <div className="w-full mt-10">
             <Button
               onClick={handleRestart}
               variant="outline"
