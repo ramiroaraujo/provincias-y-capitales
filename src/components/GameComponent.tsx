@@ -148,18 +148,18 @@ export default function GameComponent() {
             </div>
           )}
         </div>
-        {state.matches('playing') && (
-          <div className="w-full mt-10">
-            <Button
-              onClick={handleRestart}
-              variant="outline"
-              className="w-full h-12 active:scale-95 transition-transform bg-gray-700 text-white hover:bg-gray-600"
-            >
-              Reiniciar
-            </Button>
-          </div>
-        )}
       </div>
+      {state.matches('playing') && (
+        <div className="w-full mt-20">
+          <Button
+            onClick={handleRestart}
+            variant="outline"
+            className="w-full h-12 active:scale-95 transition-transform bg-gray-700 text-white hover:bg-gray-600"
+          >
+            Reiniciar
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
