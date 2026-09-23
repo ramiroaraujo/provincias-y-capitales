@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { buildQuestions, expression, levels, type Level, type Question } from '@/lib/game';
 import { capitals, paths, viewBox } from '@/lib/map';
 
-type Result = { province: string; capital: string; ok: boolean };
-
 const play = (sound: 'tap' | 'right' | 'wrong') => {
   new Audio(`/sounds/${sound}.webm`).play().catch(() => {});
 };
@@ -42,7 +40,7 @@ export default function Game() {
   // undefined = still answering, null = ran out of time
   const [picked, setPicked] = useState<string | null>();
   const [message, setMessage] = useState('');
-  const [results, setResults] = useState<Result[]>([]);
+  const [results, setResults] = useState<boolean[]>([]);
   const startedAt = useRef(0);
   const [elapsed, setElapsed] = useState(0);
 
@@ -57,7 +55,7 @@ export default function Game() {
     play(ok ? 'right' : 'wrong');
     setPicked(option);
     setMessage(option === null ? '¡Se acabó el tiempo!' : expression(ok));
-    setResults((r) => [...r, { province: q.province, capital: q.capital, ok }]);
+    setResults((r) => [...r, ok]);
   };
 
   useEffect(() => {
@@ -87,7 +85,7 @@ export default function Game() {
     setQuestions([]);
   };
 
-  const score = results.filter((r) => r.ok).length;
+  const score = results.filter(Boolean).length;
 
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-5xl flex-col gap-4 px-4 py-5 md:py-8">
@@ -200,38 +198,29 @@ export default function Game() {
             </>
           )}
 
-          {over && (
-            <>
-              <h2 className="text-2xl font-extrabold md:text-4xl">¡Terminaste!</h2>
-              <p className="text-lg">
-                Acertaste <b>{score}</b> de {results.length} en {Math.round(elapsed / 1000)} s.
+        </section>
+      </div>
+
+      {over && (
+        <div className="fixed inset-0 z-10 flex flex-col justify-end bg-[#0f1c2b] bg-[url(/final.jpg)] bg-cover bg-center">
+          <div className="bg-linear-to-t from-[#0f1c2b] via-[#0f1c2b]/85 to-transparent px-6 pt-32 pb-10 text-center text-white">
+            <div className="mx-auto flex max-w-md flex-col gap-4 [text-shadow:0_2px_12px_rgb(0_0_0/0.6)]">
+              <h2 className="text-3xl font-extrabold md:text-4xl">¡Terminaste!</h2>
+              <p className="text-7xl font-extrabold">
+                {score}
+                <span className="text-4xl text-white/60">/{results.length}</span>
               </p>
-              {score < results.length && (
-                <div className="rounded-2xl bg-(--card) p-4 shadow-sm">
-                  <h3 className="mb-2 text-sm font-bold tracking-wide text-(--muted) uppercase">
-                    Para repasar
-                  </h3>
-                  <ul className="flex flex-col gap-1">
-                    {results
-                      .filter((r) => !r.ok)
-                      .map((r) => (
-                        <li key={r.province}>
-                          {r.province}: <b>{r.capital}</b>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              )}
+              <p className="text-lg">en {Math.round(elapsed / 1000)} segundos</p>
               <button onClick={start} className="btn-primary">
                 Jugar de nuevo
               </button>
-              <button onClick={quit} className="text-sm text-(--muted) underline underline-offset-4">
+              <button onClick={quit} className="text-sm text-white/70 underline underline-offset-4">
                 Cambiar dificultad
               </button>
-            </>
-          )}
-        </section>
-      </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
