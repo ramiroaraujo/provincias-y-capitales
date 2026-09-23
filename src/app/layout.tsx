@@ -1,25 +1,25 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
+import type { Metadata, Viewport } from "next";
+import { Nunito } from "next/font/google";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] });
+const nunito = Nunito({
+  variable: "--font-nunito",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: 'Provincias y Capitales',
-  description:
-    'Juego de preguntas y respuestas para aprender las provincias y capitales de Argentina',
+  title: "Provincias y Capitales",
+  description: "Juego para aprender las capitales de las provincias argentinas",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  themeColor: "#2b7bbf",
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es">
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
-        />
-      </head>
-      <body className={inter.className}>{children}</body>
+    <html lang="es" className={`${nunito.variable} antialiased`}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
