@@ -4,8 +4,8 @@ export type Level = { id: number; name: string; options: number; seconds: number
 
 export const levels: Level[] = [
   { id: 1, name: 'Fácil', options: 3, seconds: 15 },
-  { id: 2, name: 'Medio', options: 4, seconds: 6 },
-  { id: 3, name: 'Difícil', options: 5, seconds: 3 },
+  { id: 2, name: 'Medio', options: 4, seconds: 7 },
+  { id: 3, name: 'Difícil', options: 5, seconds: 4 },
 ];
 
 export type Question = { province: string; capital: string; options: string[] };
@@ -20,13 +20,11 @@ export const shuffle = <T>(array: T[]): T[] => {
 };
 
 export const buildQuestions = (level: Level): Question[] =>
-  shuffle(provinces).map(({ province, options }) => {
-    const capital = options.find((o) => o.correct)!.name;
-    const wrong = shuffle(options.filter((o) => !o.correct && o.difficulty <= level.id))
-      .slice(0, level.options - 1)
-      .map((o) => o.name);
-    return { province, capital, options: shuffle([capital, ...wrong]) };
-  });
+  shuffle(provinces).map(({ province, capital, cities }) => ({
+    province,
+    capital,
+    options: shuffle([capital, ...shuffle(cities).slice(0, level.options - 1)]),
+  }));
 
 const cheers = [
   '¡Bien ahí!',
