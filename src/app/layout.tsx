@@ -7,9 +7,15 @@ const nunito = Nunito({
   subsets: ["latin"],
 });
 
+const title = "Provincias y Capitales";
+const description = "Juego para aprender las capitales de las provincias argentinas, con mapa y contra reloj.";
+
 export const metadata: Metadata = {
-  title: "Provincias y Capitales",
-  description: "Juego para aprender las capitales de las provincias argentinas",
+  metadataBase: new URL("https://provincias-y-capitales.vercel.app"),
+  title,
+  description,
+  openGraph: { title, description, siteName: title, locale: "es_AR", type: "website" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export const viewport: Viewport = {
