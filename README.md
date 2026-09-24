@@ -1,6 +1,9 @@
 # Provincias y Capitales
 
-Juego para practicar las capitales de las 23 provincias argentinas. Muestra la provincia en el mapa y hay que elegir su capital antes de que se acabe el tiempo.
+Juego para practicar las 23 provincias argentinas, contra reloj. Dos modos:
+
+- **Nombre**: muestra la provincia en el mapa y hay que elegir su capital.
+- **Mapa**: dice el nombre de una provincia y hay que tocarla en el mapa (la dificultad solo cambia el tiempo).
 
 | Nivel   | Opciones | Tiempo |
 | ------- | -------- | ------ |
