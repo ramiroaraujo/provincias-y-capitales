@@ -88,30 +88,33 @@ export default function Game() {
   const score = results.filter(Boolean).length;
 
   return (
-    <main className="mx-auto flex min-h-svh w-full max-w-5xl flex-col gap-4 px-4 py-5 md:py-8">
+    <main className="mx-auto flex h-svh w-full max-w-5xl flex-col gap-4 px-4 py-5 md:h-auto md:min-h-svh md:py-8">
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-extrabold tracking-tight md:text-3xl">
           Provincias <span className="text-(--accent)">y</span> Capitales
         </h1>
         {playing && (
-          <div className="flex items-center gap-2 text-sm font-semibold md:text-base">
+          <div className="flex items-center gap-2 text-sm font-semibold whitespace-nowrap md:text-base">
             <span className="rounded-full bg-(--card) px-3 py-1 shadow-sm">
               {index + 1}/{questions.length}
             </span>
             <span className="rounded-full bg-(--ok) px-3 py-1 text-white shadow-sm">✓ {score}</span>
+            <button onClick={quit} aria-label="Salir" className="rounded-full bg-(--card) px-3 py-1 shadow-sm">
+              ✕
+            </button>
           </div>
         )}
       </header>
 
-      <div className="grid flex-1 grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-start gap-4 md:grid-cols-2 md:gap-8">
-        <div className="sticky top-4 mx-auto h-[62svh] max-h-[760px] w-full md:h-[78svh]">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 md:grid md:grid-cols-2 md:items-start md:gap-8">
+        <div className="min-h-40 w-full flex-1 md:sticky md:top-4 md:h-[78svh] md:max-h-[760px] md:flex-none">
           <ArgentinaMap province={q?.province} showCapital={answered} />
         </div>
 
-        <section className="flex flex-col gap-4 md:justify-center md:self-center">
+        <section className="flex shrink-0 flex-col gap-3 md:gap-4 md:self-center">
           {!playing && !over && (
             <>
-              <p className="text-base md:text-lg">
+              <p className="md:text-lg">
                 Te muestro una provincia en el mapa y tenés que elegir su capital antes de que se
                 acabe el tiempo.
               </p>
@@ -175,26 +178,23 @@ export default function Game() {
                       key={option}
                       onClick={() => answer(option)}
                       disabled={answered}
-                      className={`min-h-12 rounded-2xl px-4 py-2.5 text-left text-base font-semibold transition active:scale-[.98] md:text-lg ${state}`}
+                      className={`min-h-11 rounded-2xl px-4 py-2 text-left text-base font-semibold transition active:scale-[.98] md:text-lg ${state}`}
                     >
                       {option}
                     </button>
                   );
                 })}
               </div>
-              {answered && (
-                <>
-                  <p className="text-lg font-bold md:text-xl" aria-live="polite">
-                    {message}
-                  </p>
+              <div className={`flex min-h-12 items-center gap-3 ${answered ? '' : 'invisible'}`}>
+                <p className="flex-1 text-lg leading-tight font-bold md:text-xl" aria-live="polite">
+                  {answered && message}
+                </p>
+                {answered && (
                   <button onClick={next} autoFocus className="btn-primary">
                     {index + 1 < questions.length ? 'Siguiente' : 'Ver resultado'}
                   </button>
-                </>
-              )}
-              <button onClick={quit} className="text-sm text-(--muted) underline underline-offset-4">
-                Salir
-              </button>
+                )}
+              </div>
             </>
           )}
 
